@@ -1,0 +1,137 @@
+<form (ngSubmit)="onSubmit()" class="space-y-6">
+  <div>
+    <label for="title" class="block text-sm font-medium text-gray-700 mb-2">
+      Titre du cours <span class="text-danger-500">*</span>
+    </label>
+    <input
+      type="text"
+      id="title"
+      name="title"
+      [(ngModel)]="formData.title"
+      [class]="errors['title'] ? 'input border-danger-500' : 'input'"
+      placeholder="Ex: Initiation à Angular"
+    />
+    <p *ngIf="errors['title']" class="mt-1 text-sm text-danger-500">
+      {{ errors['title'] }}
+    </p>
+  </div>
+
+  <div>
+    <label for="description" class="block text-sm font-medium text-gray-700 mb-2">
+      Description <span class="text-danger-500">*</span>
+    </label>
+    <textarea
+      id="description"
+      name="description"
+      rows="4"
+      [(ngModel)]="formData.description"
+      [class]="errors['description'] ? 'input border-danger-500' : 'input'"
+      placeholder="Décrivez le contenu du cours..."
+    ></textarea>
+    <p *ngIf="errors['description']" class="mt-1 text-sm text-danger-500">
+      {{ errors['description'] }}
+    </p>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div>
+      <label for="level" class="block text-sm font-medium text-gray-700 mb-2">
+        Niveau <span class="text-danger-500">*</span>
+      </label>
+      <select
+        id="level"
+        name="level"
+        [(ngModel)]="formData.level"
+        class="input"
+      >
+        <option *ngFor="let level of levels" [value]="level">{{ level }}</option>
+      </select>
+    </div>
+
+    <div>
+      <div class="flex items-center justify-between mb-2">
+        <label for="category" class="block text-sm font-medium text-gray-700">
+          Catégorie <span class="text-danger-500">*</span>
+        </label>
+        <button 
+          *ngIf="!showAddCategory"
+          type="button"
+          (click)="toggleAddCategory()"
+          class="text-sm text-primary-600 hover:text-primary-700 font-medium flex items-center gap-1"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+          </svg>
+          Ajouter une catégorie
+        </button>
+      </div>
+
+      <div *ngIf="showAddCategory" class="space-y-3">
+        <input
+          type="text"
+          [(ngModel)]="newCategoryName"
+          [name]="'newCategory'"
+          placeholder="Nom de la nouvelle catégorie"
+          class="input"
+          (keyup.enter)="addNewCategory()"
+         
+        />
+        <div class="flex gap-2">
+          <button 
+            type="button"
+            (click)="addNewCategory()"
+            class="btn btn-primary flex-1"
+          >
+            Ajouter
+          </button>
+          <button 
+            type="button"
+            (click)="toggleAddCategory()"
+            class="btn btn-secondary"
+          >
+            Annuler
+          </button>
+        </div>
+      </div>
+
+      <select
+        *ngIf="!showAddCategory"
+        id="category"
+        name="category"
+        [(ngModel)]="formData.category"
+        class="input"
+      >
+        <option *ngFor="let category of categories" [value]="category">{{ category }}</option>
+      </select>
+    </div>
+  </div>
+
+  <div>
+    <label for="duration" class="block text-sm font-medium text-gray-700 mb-2">
+      Durée estimée <span class="text-danger-500">*</span>
+    </label>
+    <input
+      type="text"
+      id="duration"
+      name="duration"
+      [(ngModel)]="formData.duration"
+      [class]="errors['duration'] ? 'input border-danger-500' : 'input'"
+      placeholder="Ex: 4h, 30min"
+    />
+    <p *ngIf="errors['duration']" class="mt-1 text-sm text-danger-500">
+      {{ errors['duration'] }}
+    </p>
+    <p class="mt-1 text-sm text-gray-500">
+      Format accepté: nombre suivi de 'h' ou 'min' (ex: 4h, 30min)
+    </p>
+  </div>
+
+  <div class="flex justify-end space-x-3 pt-4 border-t">
+    <button type="button" (click)="onCancel()" class="btn btn-secondary">
+      Annuler
+    </button>
+    <button type="submit" class="btn btn-primary">
+      {{ mode === 'create' ? 'Créer le cours' : 'Enregistrer les modifications' }}
+    </button>
+  </div>
+</form>

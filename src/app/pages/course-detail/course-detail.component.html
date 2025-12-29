@@ -1,0 +1,285 @@
+<div class="min-h-screen bg-gray-50" *ngIf="course">
+  <div class="bg-gradient-to-r from-primary-600 to-primary-800 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center mb-4">
+        <a routerLink="/" class="text-primary-100 hover:text-white mr-2">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
+          </svg>
+        </a>
+        <span [class]="'badge ' + getLevelBadgeClass()">{{ course.level }}</span>
+        <span class="mx-2 text-primary-200">•</span>
+        <span class="text-primary-100">{{ course.category }}</span>
+      </div>
+      
+      <h1 class="text-4xl font-bold mb-4">{{ course.title }}</h1>
+      <p class="text-xl text-primary-100 mb-6">{{ course.description }}</p>
+      
+      <div class="flex flex-wrap gap-4 text-sm">
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          {{ course.duration }}
+        </div>
+        <div class="flex items-center">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          {{ course.lessons.length }} leçons
+        </div>
+        <div class="flex items-center" *ngIf="course.quizzes.length > 0">
+          <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+          {{ course.quizzes.length }} quiz
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-2">
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 class="text-2xl font-bold mb-4">Leçons du cours</h2>
+          
+          <div *ngIf="isEnrolled" class="mb-6">
+            <app-progress-bar [progress]="progress" />
+            <p class="text-sm text-gray-600 mt-2">
+              {{ completedLessonIds.length }} / {{ course.lessons.length }} leçons terminées
+            </p>
+          </div>
+
+          <app-lesson-list
+            [lessons]="course.lessons"
+            [completedLessonIds]="completedLessonIds"
+            (toggleLesson)="onToggleLesson($event)"
+          />
+        </div>
+
+        <div class="bg-white rounded-lg shadow-md p-6" *ngIf="course.quizzes.length > 0">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-2xl font-bold">Quiz du cours</h2>
+            <span class="badge bg-primary-100 text-primary-800">
+              {{ course.quizzes.length }} question(s)
+            </span>
+          </div>
+          <p class="text-gray-600 mb-4">
+            Testez vos connaissances avec notre quiz interactif
+          </p>
+          <button 
+            (click)="startQuiz()"
+            class="btn btn-primary"
+          >
+            Commencer le quiz
+          </button>
+        </div>
+      </div>
+
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-20">
+          <h3 class="text-lg font-bold mb-4">Actions</h3>
+          
+          <button 
+            *ngIf="!isEnrolled"
+            (click)="onEnroll()"
+            class="btn btn-primary w-full mb-3"
+          >
+            <svg class="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+            </svg>
+            S'inscrire au cours
+          </button>
+
+          <div *ngIf="isEnrolled" class="mb-4 p-4 bg-success-50 border border-success-200 rounded-lg">
+            <div class="flex items-center text-success-800">
+              <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+              </svg>
+              <span class="font-medium">Vous êtes inscrit</span>
+            </div>
+          </div>
+
+          <a routerLink="/student" class="btn btn-secondary w-full mb-3">
+            Mon espace étudiant
+          </a>
+
+          <div class="border-t pt-4 mt-4">
+            <h4 class="font-semibold text-gray-900 mb-2">Détails</h4>
+            <dl class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <dt class="text-gray-600">Niveau</dt>
+                <dd class="font-medium">{{ course.level }}</dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-gray-600">Catégorie</dt>
+                <dd class="font-medium">{{ course.category }}</dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-gray-600">Durée totale</dt>
+                <dd class="font-medium">{{ course.duration }}</dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-gray-600">Leçons</dt>
+                <dd class="font-medium">{{ course.lessons.length }}</dd>
+              </div>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div 
+  *ngIf="showQuiz && course" 
+  class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4"
+  (click)="closeQuiz()"
+>
+  <div 
+    class="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="sticky top-0 bg-white border-b px-6 py-4 flex items-center justify-between">
+      <h3 class="text-xl font-bold">Quiz - {{ course.title }}</h3>
+      <button 
+        (click)="closeQuiz()"
+        class="text-gray-400 hover:text-gray-600"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="p-6" *ngIf="!quizCompleted && currentQuiz">
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-2">
+          <span class="text-sm font-medium text-gray-600">
+            Question {{ currentQuizIndex + 1 }} / {{ course.quizzes.length }}
+          </span>
+          <span class="text-sm text-gray-500">
+            {{ answeredQuestionsCount }} / {{ course.quizzes.length }} répondu(es)
+          </span>
+        </div>
+        <div class="w-full h-2 bg-gray-200 rounded-full">
+          <div 
+            class="h-full bg-primary-500 rounded-full transition-all"
+            [style.width.%]="((currentQuizIndex + 1) / course.quizzes.length) * 100"
+          ></div>
+        </div>
+      </div>
+
+      <h4 class="text-lg font-semibold mb-4">{{ currentQuiz.question }}</h4>
+
+      <div class="space-y-3">
+        <button
+          *ngFor="let option of currentQuiz.options; let i = index"
+          (click)="selectAnswer(i)"
+          [class]="selectedAnswers[currentQuizIndex] === i 
+            ? 'w-full text-left p-4 border-2 border-primary-500 bg-primary-50 rounded-lg transition-all'
+            : 'w-full text-left p-4 border-2 border-gray-200 hover:border-primary-300 rounded-lg transition-all'"
+        >
+          <div class="flex items-center">
+            <div 
+              [class]="selectedAnswers[currentQuizIndex] === i
+                ? 'w-5 h-5 rounded-full border-2 border-primary-500 bg-primary-500 flex items-center justify-center flex-shrink-0'
+                : 'w-5 h-5 rounded-full border-2 border-gray-300 flex-shrink-0'"
+            >
+              <div *ngIf="selectedAnswers[currentQuizIndex] === i" class="w-2 h-2 bg-white rounded-full"></div>
+            </div>
+            <span class="ml-3">{{ option }}</span>
+          </div>
+        </button>
+      </div>
+
+      <div class="flex justify-between mt-6 pt-6 border-t">
+        <button
+          (click)="previousQuestion()"
+          [disabled]="currentQuizIndex === 0"
+          class="btn btn-secondary"
+          [class.opacity-50]="currentQuizIndex === 0"
+        >
+          Précédent
+        </button>
+
+        <button
+          *ngIf="currentQuizIndex < course.quizzes.length - 1"
+          (click)="nextQuestion()"
+          class="btn btn-primary"
+        >
+          Suivant
+        </button>
+
+        <button
+          *ngIf="currentQuizIndex === course.quizzes.length - 1"
+          (click)="submitQuiz()"
+          [disabled]="!canSubmitQuiz"
+          class="btn btn-success"
+          [class.opacity-50]="!canSubmitQuiz"
+        >
+          Soumettre
+        </button>
+      </div>
+    </div>
+
+    <div class="p-6 text-center" *ngIf="quizCompleted">
+      <div class="mb-6">
+        <div 
+          [class]="quizScore >= 70 
+            ? 'w-24 h-24 mx-auto mb-4 rounded-full bg-success-100 flex items-center justify-center'
+            : 'w-24 h-24 mx-auto mb-4 rounded-full bg-warning-100 flex items-center justify-center'"
+        >
+          <svg 
+            *ngIf="quizScore >= 70"
+            class="w-12 h-12 text-success-600" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+          <svg 
+            *ngIf="quizScore < 70"
+            class="w-12 h-12 text-warning-600" 
+            fill="none" 
+            stroke="currentColor" 
+            viewBox="0 0 24 24"
+          >
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+          </svg>
+        </div>
+        
+        <h3 class="text-2xl font-bold mb-2">
+          {{ quizScore >= 70 ? 'Félicitations !' : 'Continuez vos efforts !' }}
+        </h3>
+        <p class="text-gray-600 mb-4">Votre score</p>
+        <p class="text-5xl font-bold text-primary-600 mb-6">{{ quizScore }}%</p>
+        
+        <div class="bg-gray-50 rounded-lg p-4 max-w-md mx-auto">
+          <p class="text-sm text-gray-600">
+            Vous avez répondu correctement à 
+            <span class="font-bold">{{ (quizScore / 100 * course.quizzes.length) | number:'1.0-0' }}</span>
+            question(s) sur 
+            <span class="font-bold">{{ course.quizzes.length }}</span>
+          </p>
+        </div>
+      </div>
+
+      <button (click)="closeQuiz()" class="btn btn-primary">
+        Terminer
+      </button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!course" class="min-h-screen flex items-center justify-center">
+  <div class="text-center">
+    <h2 class="text-2xl font-bold text-gray-900 mb-2">Cours non trouvé</h2>
+    <p class="text-gray-600 mb-4">Le cours que vous recherchez n'existe pas</p>
+    <a routerLink="/" class="btn btn-primary">
+      Retour à l'accueil
+    </a>
+  </div>
+</div>

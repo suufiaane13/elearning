@@ -1,0 +1,56 @@
+<div class="card group cursor-pointer h-full flex flex-col">
+  <a [routerLink]="['/course', course.id]" class="flex flex-col h-full">
+    <div class="flex-1 flex flex-col p-5">
+      <div class="flex items-center justify-between mb-3">
+        <span [class]="'badge ' + getLevelBadgeClass()">
+          {{ course.level }}
+        </span>
+        <span [class]="'text-xs font-semibold uppercase tracking-wide ' + getCategoryColor()">
+          {{ course.category }}
+        </span>
+      </div>
+
+      <h3 class="text-lg font-bold text-gray-900 mb-2 group-hover:text-primary-600 transition-colors line-clamp-2">
+        {{ course.title }}
+      </h3>
+
+      <p class="text-gray-600 text-sm mb-3 line-clamp-2 flex-1">
+        {{ course.description }}
+      </p>
+
+      <div class="grid grid-cols-2 gap-4 py-3 border-t border-gray-100">
+        <div class="text-center">
+          <div class="text-xs text-gray-500 mb-1">Durée</div>
+          <div class="text-sm font-semibold text-gray-900">{{ course.duration }}</div>
+        </div>
+        <div class="text-center border-l border-gray-100">
+          <div class="text-xs text-gray-500 mb-1">Leçons</div>
+          <div class="text-sm font-semibold text-gray-900">{{ course.lessons.length }}</div>
+        </div>
+      </div>
+
+      <div class="mt-3">
+        <div *ngIf="isEnrolled && progress !== undefined" class="space-y-2">
+          <div class="flex items-center justify-between text-xs">
+            <span class="text-gray-600 font-medium">Progression</span>
+            <span class="font-bold text-primary-600">{{ progress }}%</span>
+          </div>
+          <div class="w-full h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              class="h-full bg-success-500 transition-all duration-300"
+              [style.width.%]="progress"
+            ></div>
+          </div>
+        </div>
+
+        <button 
+          *ngIf="!isEnrolled"
+          (click)="onEnroll($event)"
+          class="btn btn-primary w-full text-sm"
+        >
+          S'inscrire au cours
+        </button>
+      </div>
+    </div>
+  </a>
+</div>

@@ -1,0 +1,262 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="bg-gradient-to-r from-purple-600 to-purple-800 text-white py-12">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <h1 class="text-4xl font-bold mb-2">Administration</h1>
+      <p class="text-xl text-purple-100">Gérez vos cours, leçons et quiz</p>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div class="lg:col-span-1">
+        <div class="bg-white rounded-lg shadow-md p-6 sticky top-20">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="text-xl font-bold">Cours ({{ courses.length }})</h2>
+            <button (click)="openCreateCourse()" class="btn btn-primary text-sm">
+              <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+              </svg>
+              Nouveau
+            </button>
+          </div>
+
+          <div class="space-y-2 max-h-[600px] overflow-y-auto">
+            <button
+              *ngFor="let course of courses"
+              (click)="selectCourse(course)"
+              [class]="selectedCourse?.id === course.id
+                ? 'w-full text-left p-3 border-2 border-primary-500 bg-primary-50 rounded-lg transition-all'
+                : 'w-full text-left p-3 border border-gray-200 hover:border-primary-300 rounded-lg transition-all'"
+            >
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <h3 class="font-semibold text-gray-900 mb-1">{{ course.title }}</h3>
+                  <div class="flex items-center gap-2 text-xs text-gray-600">
+                    <span class="badge badge-beginner text-xs py-0">{{ course.level }}</span>
+                    <span>{{ course.lessons.length }} leçons</span>
+                  </div>
+                </div>
+                <svg 
+                  *ngIf="selectedCourse?.id === course.id"
+                  class="w-5 h-5 text-primary-600 flex-shrink-0" 
+                  fill="currentColor" 
+                  viewBox="0 0 24 24"
+                >
+                  <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+              </div>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="lg:col-span-2">
+        <div *ngIf="showCourseForm" class="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h2 class="text-2xl font-bold mb-6">
+            {{ courseFormMode === 'create' ? 'Nouveau cours' : 'Modifier le cours' }}
+          </h2>
+          <app-course-form
+            [course]="selectedCourse"
+            [mode]="courseFormMode"
+            (save)="onSaveCourse($event)"
+            (cancelForm)="onCancelCourseForm()"
+          />
+        </div>
+
+        <div *ngIf="!showCourseForm && !selectedCourse" class="text-center py-16">
+          <svg class="w-24 h-24 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+          </svg>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">Aucun cours sélectionné</h3>
+          <p class="text-gray-600 mb-4">Sélectionnez un cours dans la liste ou créez-en un nouveau</p>
+          <button (click)="openCreateCourse()" class="btn btn-primary">
+            Créer un nouveau cours
+          </button>
+        </div>
+
+        <div *ngIf="!showCourseForm && selectedCourse">
+          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-start justify-between mb-4">
+              <div class="flex-1">
+                <div class="flex items-center gap-2 mb-2">
+                  <span class="badge badge-beginner">{{ selectedCourse.level }}</span>
+                  <span class="text-gray-600">{{ selectedCourse.category }}</span>
+                </div>
+                <h2 class="text-2xl font-bold mb-2">{{ selectedCourse.title }}</h2>
+                <p class="text-gray-600">{{ selectedCourse.description }}</p>
+              </div>
+            </div>
+
+            <div class="flex gap-2 pt-4 border-t">
+              <button (click)="openEditCourse(selectedCourse)" class="btn btn-primary">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                </svg>
+                Modifier
+              </button>
+              <button (click)="deleteCourse(selectedCourse)" class="btn btn-danger">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                </svg>
+                Supprimer
+              </button>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold">Leçons ({{ selectedCourse.lessons.length }})</h3>
+              <button (click)="openAddLesson()" class="btn btn-primary text-sm">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Ajouter une leçon
+              </button>
+            </div>
+
+            <div *ngIf="!showLessonForm && selectedCourse.lessons.length === 0" class="text-center py-8 text-gray-500">
+              <p>Aucune leçon pour ce cours</p>
+            </div>
+
+            <div *ngIf="!showLessonForm && selectedCourse.lessons.length > 0" class="space-y-3">
+              <div 
+                *ngFor="let lesson of selectedCourse.lessons; let i = index"
+                class="border border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-all"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-gray-900 mb-2">
+                      {{ lesson.title }}
+                    </h4>
+                    <p class="text-sm text-gray-600">{{ lesson.content }}</p>
+                  </div>
+                  <div class="flex gap-2 ml-4">
+                    <button (click)="editLesson(lesson.id)" class="text-primary-600 hover:text-primary-700">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+                      </svg>
+                    </button>
+                    <button (click)="deleteLesson(lesson.id)" class="text-danger-500 hover:text-danger-600">
+                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="showLessonForm" class="border-t pt-4 mt-4">
+              <h4 class="font-semibold mb-4">{{ editingLessonId ? 'Modifier la leçon' : 'Nouvelle leçon' }}</h4>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Titre <span class="text-danger-500">*</span>
+                  </label>
+                  <input 
+                    type="text" 
+                    [(ngModel)]="lessonFormData.title" 
+                    class="input" 
+                    placeholder="Titre de la leçon" 
+                  />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">
+                    Contenu <span class="text-danger-500">*</span>
+                  </label>
+                  <textarea 
+                    rows="4" 
+                    [(ngModel)]="lessonFormData.content" 
+                    class="input" 
+                    placeholder="Description complète du contenu de la leçon"
+                  ></textarea>
+                </div>
+                <div class="flex justify-end gap-2">
+                  <button type="button" (click)="showLessonForm = false" class="btn btn-secondary">Annuler</button>
+                  <button type="button" (click)="saveLesson()" class="btn btn-primary">Enregistrer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-md p-6">
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="text-xl font-bold">Quiz ({{ selectedCourse.quizzes.length }})</h3>
+              <button (click)="openAddQuiz()" class="btn btn-primary text-sm">
+                <svg class="w-4 h-4 inline mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                </svg>
+                Ajouter un quiz
+              </button>
+            </div>
+
+            <div *ngIf="!showQuizForm && selectedCourse.quizzes.length === 0" class="text-center py-8 text-gray-500">
+              <p>Aucun quiz pour ce cours</p>
+            </div>
+
+            <div *ngIf="!showQuizForm && selectedCourse.quizzes.length > 0" class="space-y-3">
+              <div 
+                *ngFor="let quiz of selectedCourse.quizzes; let i = index"
+                class="border border-gray-200 rounded-lg p-4 hover:border-primary-300 transition-all"
+              >
+                <div class="flex items-start justify-between">
+                  <div class="flex-1">
+                    <h4 class="font-semibold text-gray-900 mb-2">Question {{ i + 1 }}: {{ quiz.question }}</h4>
+                    <ul class="space-y-1 mb-2">
+                      <li *ngFor="let option of quiz.options; let j = index" 
+                          [class]="j === quiz.correctAnswer ? 'text-success-600 font-medium' : 'text-gray-600'"
+                          class="text-sm">
+                        {{ j + 1 }}. {{ option }} 
+                        <span *ngIf="j === quiz.correctAnswer" class="text-xs">(Réponse correcte)</span>
+                      </li>
+                    </ul>
+                  </div>
+                  <button (click)="deleteQuiz(quiz.id)" class="text-danger-500 hover:text-danger-600 ml-4">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div *ngIf="showQuizForm" class="border-t pt-4 mt-4">
+              <h4 class="font-semibold mb-4">Nouveau quiz</h4>
+              <div class="space-y-4">
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Question</label>
+                  <input type="text" [(ngModel)]="quizFormData.question" class="input" placeholder="Votre question" />
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Options de réponse</label>
+                  <div class="space-y-2">
+                    <div *ngFor="let option of quizFormData.options; let i = index; trackBy: trackByOption" class="flex items-center gap-2">
+                      <input 
+                        type="radio" 
+                        [name]="'correct-answer'" 
+                        [value]="i"
+                        [(ngModel)]="quizFormData.correctAnswer"
+                        class="w-4 h-4 text-primary-600"
+                      />
+                      <input 
+                        type="text" 
+                        [(ngModel)]="quizFormData.options[i]" 
+                        class="input flex-1" 
+                        [placeholder]="'Option ' + (i + 1)" 
+                      />
+                    </div>
+                  </div>
+                  <p class="text-xs text-gray-500 mt-2">Cochez la bonne réponse</p>
+                </div>
+                <div class="flex justify-end gap-2">
+                  <button type="button" (click)="showQuizForm = false" class="btn btn-secondary">Annuler</button>
+                  <button type="button" (click)="saveQuiz()" class="btn btn-primary">Enregistrer</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

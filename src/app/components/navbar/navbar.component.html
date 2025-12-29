@@ -1,0 +1,78 @@
+<nav class="bg-white shadow-md sticky top-0 z-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between h-16">
+      <div class="flex items-center">
+        <a routerLink="/" class="flex items-center space-x-2">
+          <svg class="w-8 h-8 text-primary-600" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 3L1 9l11 6 9-4.91V17h2V9M5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/>
+          </svg>
+          <span class="text-xl font-bold text-gray-900">E-Learning</span>
+        </a>
+      </div>
+
+      <div class="hidden md:flex items-center space-x-4">
+        <a 
+          routerLink="/student" 
+          routerLinkActive="text-primary-600 border-b-2 border-primary-600"
+          class="px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors"
+        >
+          Mon Espace
+        </a>
+        <a 
+          routerLink="/admin" 
+          routerLinkActive="text-primary-600 border-b-2 border-primary-600"
+          class="px-3 py-2 text-gray-700 hover:text-primary-600 transition-colors"
+        >
+          Administration
+        </a>
+      </div>
+
+      <button 
+        (click)="toggleMenu()"
+        class="md:hidden flex items-center text-gray-700 hover:text-primary-600"
+        aria-label="Menu"
+      >
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path 
+            *ngIf="!isMenuOpen" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            stroke-width="2" 
+            d="M4 6h16M4 12h16M4 18h16"
+          />
+          <path 
+            *ngIf="isMenuOpen" 
+            stroke-linecap="round" 
+            stroke-linejoin="round" 
+            stroke-width="2" 
+            d="M6 18L18 6M6 6l12 12"
+          />
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div 
+    *ngIf="isMenuOpen" 
+    class="md:hidden bg-white border-t border-gray-200"
+  >
+    <div class="px-4 pt-2 pb-4 space-y-2">
+      <a 
+        routerLink="/student" 
+        (click)="closeMenu()"
+        routerLinkActive="bg-primary-50 text-primary-600"
+        class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+      >
+        Mon Espace
+      </a>
+      <a 
+        routerLink="/admin" 
+        (click)="closeMenu()"
+        routerLinkActive="bg-primary-50 text-primary-600"
+        class="block px-3 py-2 rounded-md text-gray-700 hover:bg-gray-100 transition-colors"
+      >
+        Administration
+      </a>
+    </div>
+  </div>
+</nav>
